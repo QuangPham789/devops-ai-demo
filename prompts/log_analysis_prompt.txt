@@ -1,0 +1,1 @@
+Summarize the given Jenkins build log in up to 5 sentences, identify the most likely root cause, and suggest one practical fix.

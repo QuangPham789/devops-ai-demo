@@ -1,0 +1,5 @@
+Write a Jenkinsfile that:
+- Checks out code from GitHub
+- Runs `go test ./...`
+- Builds Docker image and pushes to Docker Hub
+- On failure, collect last 200 lines of log and POST to an analysis endpoint at http://localhost:8080/analyze-log

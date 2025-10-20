@@ -1,0 +1,6 @@
+Write a Dockerfile for a Go application that:
+- Uses multi-stage build
+- Builds a static binary
+- Runs as non-root user
+- Exposes port 8080
+- Optimized for small image size

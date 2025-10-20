@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  app:
+    build: ./docker
+    image: go-ai-devops/app:local
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_PORT=8080
+    depends_on:
+      - prometheus
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    user: root
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+    ports:
+      - "8081:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alert_rules.yml:/etc/prometheus/alert_rules.yml
+    ports:
+      - "9090:9090"
+
+volumes:
+  jenkins_home:
