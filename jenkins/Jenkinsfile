@@ -6,7 +6,7 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git url: 'https://github.com/youruser/go-ai-devops.git', branch: 'main'
+        git url: 'https://github.com/QuangPham789/devops-ai-demo.git', branch: 'main'
       }
     }
     stage('Test') {
@@ -16,7 +16,7 @@ pipeline {
     }
     stage('Build Docker') {
       steps {
-        sh 'docker build -t yourdockeruser/go-ai-devops:${BUILD_NUMBER} ../docker'
+        sh 'docker build -t quangpham789/go-ai-devops:${BUILD_NUMBER} ../docker'
       }
     }
     stage('Push Docker') {
