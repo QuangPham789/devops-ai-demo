@@ -15,7 +15,7 @@ pipeline {
     stage('Build Docker') {
       steps {
         sh 'docker build -t quangpham789/go-ai-devops:${BUILD_NUMBER} ../docker'
-      }
+      } 
     }
     stage('Push Docker') {
       steps {
