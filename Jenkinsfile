@@ -1,8 +1,5 @@
 pipeline {
   agent any
-  // environment {
-  //   // Assuming you put Docker Hub creds into Jenkins Credentials with id 'dockerhub'
-  // }
   stages {
     stage('Checkout') {
       steps {
