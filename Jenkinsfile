@@ -41,7 +41,7 @@ pipeline {
           -H 'Content-Type: application/json' \
           -d '{"log":"BUILD_LOG_PLACEHOLDER"}' || true
         """
-
+ 
       }
     }
   }
