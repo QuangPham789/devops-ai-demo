@@ -42,12 +42,6 @@ pipeline {
           -d '{"log":"BUILD_LOG_PLACEHOLDER"}' || true
         """
 
-        // Hoặc gửi thêm Slack alert nếu muốn
-        // sh '''
-        // curl -X POST -H 'Content-type: application/json' \
-        // --data '{"text":"🚨 Build failed for go-ai-devops (#${BUILD_NUMBER})"}' \
-        // $SLACK_WEBHOOK_URL
-        // '''
       }
     }
   }
