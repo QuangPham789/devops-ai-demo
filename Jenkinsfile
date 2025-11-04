@@ -42,7 +42,7 @@ pipeline {
           -d '{"log":"BUILD_LOG_PLACEHOLDER"}' || true
         """
  
-      }
+      } 
     }
   }
 }
