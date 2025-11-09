@@ -121,12 +121,10 @@
 //     }
 // }
 // }
-
 pipeline {
     agent any
 
     environment {
-        // Docker Hub credentials (nếu cần)
         DOCKERHUB_CREDENTIALS = 'dockerhub'
     }
 
@@ -139,51 +137,40 @@ pipeline {
 
         stage('Test') {
             steps {
-                // Tránh crash pipeline nếu go test fail
-                sh 'go test ./... || true'
+                // redirect stdout + stderr vào build.log, tiếp tục dù fail
+                sh '''
+                set +e
+                go test ./... 2>&1 | tee -a build.log
+                '''
             }
         }
 
         stage('Build Docker') {
             steps {
-                sh 'docker build -t quangpham789/go-ai-devops:${BUILD_NUMBER} ../docker'
+                sh '''
+                set +e
+                docker build -t quangpham789/go-ai-devops:${BUILD_NUMBER} ../docker 2>&1 | tee -a build.log
+                '''
             }
         }
 
         stage('Push Docker') {
             steps {
                 withCredentials([usernamePassword(credentialsId: env.DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push quangpham789/go-ai-devops:${BUILD_NUMBER}'
+                    sh '''
+                    set +e
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin 2>&1 | tee -a build.log
+                    docker push quangpham789/go-ai-devops:${BUILD_NUMBER} 2>&1 | tee -a build.log
+                    '''
                 }
             }
         }
     }
 
-//     post {
-//     failure {
-//         script {
-//             sh '''
-//             #!/bin/sh
-//             set +e
-
-//             LOG_JSON='{"log":"BUILD_LOG_PLACEHOLDER"}'
-
-//             # Thay localhost nếu agent là container
-//             TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
-
-//             echo "Sending log to $TARGET_URL ..."
-//             curl -v -X POST $TARGET_URL \
-//                  -H "Content-Type: application/json" \
-//                  -d "$LOG_JSON" || true
-//             '''
-//         }
-//     }
-// }
-post {
+    post {
         failure {
             script {
-                // chỉ gửi nếu build.log tồn tại
+                // gửi build.log nếu tồn tại
                 sh '''
                 if [ -f build.log ]; then
                     TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
@@ -199,4 +186,3 @@ post {
         }
     }
 }
-
