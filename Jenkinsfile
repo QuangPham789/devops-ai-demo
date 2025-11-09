@@ -1,7 +1,5 @@
 pipeline {
-  agent {
-    docker { image 'golang:1.22' }
-  }
+  agent any
 
   stages {
     stage('Checkout') {
@@ -37,7 +35,7 @@ pipeline {
       script {
         // Gửi alert tới local log analyzer
         sh """
-        curl -s -X POST http://host.docker.internal:8080/analyze-log \
+        curl -s -X POST https://outputs-watts-visual-relay.trycloudflare.com/analyze-log \
           -H 'Content-Type: application/json' \
           -d '{"log":"BUILD_LOG_PLACEHOLDER"}' || true
         """
