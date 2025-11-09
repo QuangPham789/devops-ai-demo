@@ -51,7 +51,7 @@ pipeline {
     environment {
         // khai báo user & token ở đây để sử dụng trong post
         JENKINS_USER = 'admin'
-        JENKINS_API_TOKEN = '74dc0fcf9b84aca22624031a7b088c2a'
+        JENKINS_API_TOKEN = '11ad818e8b9af83ddd92ef90e20e914721'
     }
 
     stages {
