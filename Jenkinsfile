@@ -35,7 +35,7 @@ pipeline {
       script {
         // Gửi alert tới local log analyzer
         sh """
-        curl -s -X POST https://outputs-watts-visual-relay.trycloudflare.com/analyze-log \
+        curl -s -X POST http://localhost:8080/analyze-log \
           -H 'Content-Type: application/json' \
           -d '{"log":"BUILD_LOG_PLACEHOLDER"}' || true
         """
