@@ -8,15 +8,25 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                sh 'git clone -b main https://github.com/QuangPham789/devops-ai-demo.git . 2>&1 | tee -a build.log'
+                // Nếu repo đã clone, dùng pull để tránh lỗi
+                sh '''
+                if [ -d ".git" ]; then
+                    git reset --hard
+                    git clean -fd
+                    git pull origin main 2>&1 | tee -a build.log
+                else
+                    git clone -b main https://github.com/QuangPham789/devops-ai-demo.git . 2>&1 | tee -a build.log
+                fi
+                '''
             }
         }
 
         stage('Test') {
             steps {
+                // Capture log nhưng vẫn fail nếu go test fail
                 sh '''
-                set +e
                 go test ./... 2>&1 | tee -a build.log
+                test ${PIPESTATUS[0]} -eq 0
                 '''
             }
         }
@@ -24,8 +34,8 @@ pipeline {
         stage('Build Docker') {
             steps {
                 sh '''
-                set +e
                 docker build -t quangpham789/go-ai-devops:${BUILD_NUMBER} ../docker 2>&1 | tee -a build.log
+                test ${PIPESTATUS[0]} -eq 0
                 '''
             }
         }
@@ -34,9 +44,9 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: env.DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
-                    set +e
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin 2>&1 | tee -a build.log
                     docker push quangpham789/go-ai-devops:${BUILD_NUMBER} 2>&1 | tee -a build.log
+                    test ${PIPESTATUS[1]} -eq 0
                     '''
                 }
             }
@@ -47,7 +57,6 @@ pipeline {
         failure {
             script {
                 sh '''
-                set +e
                 TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
 
                 if [ -f build.log ]; then
