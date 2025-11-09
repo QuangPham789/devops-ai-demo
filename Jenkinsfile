@@ -106,12 +106,12 @@ pipeline {
             sh """
             set +e
             # Lấy crumb và parse bằng sed
-            CRUMB=\$(curl -s -u ${JENKINS_USER}:${JENKINS_API_TOKEN} http://localhost:8080/crumbIssuer/api/json | sed -n 's/.*"crumb":"\\([^"]*\\)".*/\\1/p')
+            CRUMB=\$(curl -s -u ${JENKINS_USER}:${JENKINS_API_TOKEN} https://voltage-dietary-sentence-attempts.trycloudflare.com/crumbIssuer/api/json | sed -n 's/.*"crumb":"\\([^"]*\\)".*/\\1/p')
             
             echo "Crumb: \$CRUMB"
 
             # Gửi POST log
-            curl -s -X POST http://localhost:8080/analyze-log \\
+            curl -s -X POST http://localhost:8085/analyze-log \\
               -H 'Content-Type: application/json' \\
               -H "Jenkins-Crumb:\$CRUMB" \\
               -u ${JENKINS_USER}:${JENKINS_API_TOKEN} \\
