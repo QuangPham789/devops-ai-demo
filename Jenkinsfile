@@ -181,20 +181,21 @@ pipeline {
 //     }
 // }
 
- post {
-        failure {
-            script {
-                sh '''
-                TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
+post {
+    failure {
+        script {
+            def logText = readFile('build.log')  // đọc nội dung file
+            def logJson = groovy.json.JsonOutput.toJson([log: logText])
 
-                echo "Sending build.log to $TARGET_URL ..."
-                curl -v -X POST $TARGET_URL \
-                     -H "Content-Type: text/plain" \
-                     --data-binary @build.log || true
-                '''
-            }
+            sh """
+            TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
+            curl -v -X POST $TARGET_URL \
+                 -H "Content-Type: application/json" \
+                 -d '$logJson' || true
+            """
         }
     }
+}
 
 }
 
