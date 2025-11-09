@@ -180,22 +180,23 @@ pipeline {
 //         }
 //     }
 // }
-
 post {
-    failure {
-        script {
-            def logText = readFile('build.log')  // đọc nội dung file
-            def logJson = groovy.json.JsonOutput.toJson([log: logText])
-
-            sh """
-            TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
-            curl -v -X POST $TARGET_URL \
-                 -H "Content-Type: application/json" \
-                 -d '$logJson' || true
-            """
+        failure {
+            script {
+                // chỉ gửi nếu build.log tồn tại
+                sh '''
+                if [ -f build.log ]; then
+                    TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
+                    echo "Sending build.log to $TARGET_URL ..."
+                    curl -v -X POST $TARGET_URL \
+                         -H "Content-Type: text/plain" \
+                         --data-binary @build.log || true
+                else
+                    echo "build.log not found!"
+                fi
+                '''
+            }
         }
     }
-}
-
 }
 
