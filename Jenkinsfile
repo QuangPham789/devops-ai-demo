@@ -161,29 +161,29 @@ pipeline {
     }
 
     post {
-        failure {
-            script {
-                sh '''
-                #!/bin/bash
-                set +e
+    failure {
+        script {
+            sh '''
+            #!/bin/sh
+            set +e
 
-                # Kiểm tra curl có sẵn
-                if ! command -v curl &> /dev/null
-                then
-                    echo "curl not found, skipping log post"
-                    exit 0
-                fi
+            # Kiểm tra curl có sẵn
+            if ! command -v curl >/dev/null 2>&1
+            then
+                echo "curl not found, skipping log post"
+                exit 0
+            fi
 
-                # Gửi log tới service Go
-                LOG_JSON="{\\"log\\":\\"BUILD_LOG_PLACEHOLDER\\"}"
-                curl -s -X POST http://localhost:8085/analyze-log \\
-                    -H "Content-Type: application/json" \\
-                    -d "$LOG_JSON" || true
+            # Gửi log tới Go service
+            LOG_JSON="{\\"log\\":\\"BUILD_LOG_PLACEHOLDER\\"}"
+            curl -s -X POST http://localhost:8085/analyze-log \
+                -H "Content-Type: application/json" \
+                -d "$LOG_JSON" || true
 
-                echo "Log sent to Go service on port 8085"
-                '''
-            }
+            echo "Log sent to Go service on port 8085"
+            '''
         }
     }
+}
 }
 
