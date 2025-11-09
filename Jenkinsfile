@@ -181,30 +181,20 @@ pipeline {
 //     }
 // }
 
-post {
-    failure {
-        script {
-            // Lấy log của build hiện tại
-            def buildLog = currentBuild.rawBuild.getLog(1000).join("\n") // lấy max 1000 dòng
+ post {
+        failure {
+            script {
+                sh '''
+                TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
 
-            // escape các ký tự đặc biệt cho JSON
-            def logJson = groovy.json.JsonOutput.toJson([log: buildLog])
-
-            // gửi curl
-            sh """
-            #!/bin/sh
-            set +e
-
-            TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
-
-            echo "Sending log to \$TARGET_URL ..."
-            curl -v -X POST \$TARGET_URL \
-                 -H "Content-Type: application/json" \
-                 -d '$logJson' || true
-            """
+                echo "Sending build.log to $TARGET_URL ..."
+                curl -v -X POST $TARGET_URL \
+                     -H "Content-Type: text/plain" \
+                     --data-binary @build.log || true
+                '''
+            }
         }
     }
-}
 
 }
 
