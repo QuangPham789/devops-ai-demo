@@ -170,7 +170,7 @@ pipeline {
             LOG_JSON='{"log":"BUILD_LOG_PLACEHOLDER"}'
 
             # Thay localhost nếu agent là container
-            TARGET_URL="http://localhost:8085/analyze-log"
+            TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
 
             echo "Sending log to $TARGET_URL ..."
             curl -v -X POST $TARGET_URL \
