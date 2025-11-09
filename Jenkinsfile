@@ -160,23 +160,48 @@ pipeline {
         }
     }
 
-    post {
+//     post {
+//     failure {
+//         script {
+//             sh '''
+//             #!/bin/sh
+//             set +e
+
+//             LOG_JSON='{"log":"BUILD_LOG_PLACEHOLDER"}'
+
+//             # Thay localhost nếu agent là container
+//             TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
+
+//             echo "Sending log to $TARGET_URL ..."
+//             curl -v -X POST $TARGET_URL \
+//                  -H "Content-Type: application/json" \
+//                  -d "$LOG_JSON" || true
+//             '''
+//         }
+//     }
+// }
+
+post {
     failure {
         script {
-            sh '''
+            // Lấy log của build hiện tại
+            def buildLog = currentBuild.rawBuild.getLog(1000).join("\n") // lấy max 1000 dòng
+
+            // escape các ký tự đặc biệt cho JSON
+            def logJson = groovy.json.JsonOutput.toJson([log: buildLog])
+
+            // gửi curl
+            sh """
             #!/bin/sh
             set +e
 
-            LOG_JSON='{"log":"BUILD_LOG_PLACEHOLDER"}'
-
-            # Thay localhost nếu agent là container
             TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
 
-            echo "Sending log to $TARGET_URL ..."
-            curl -v -X POST $TARGET_URL \
+            echo "Sending log to \$TARGET_URL ..."
+            curl -v -X POST \$TARGET_URL \
                  -H "Content-Type: application/json" \
-                 -d "$LOG_JSON" || true
-            '''
+                 -d '$logJson' || true
+            """
         }
     }
 }
