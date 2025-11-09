@@ -44,29 +44,20 @@ pipeline {
   //   }
   // }
 }
-post {
+ post {
     failure {
         script {
-            // Lấy crumb từ Jenkins
-            def crumbJson = sh(
-                script: "curl -s -u ${JENKINS_USER}:${JENKINS_API_TOKEN} http://localhost:8080/crumbIssuer/api/json",
-                returnStdout: true
-            ).trim()
-
-            def crumb = sh(
-                script: "echo '${crumbJson}' | jq -r '.crumb'",
-                returnStdout: true
-            ).trim()
-
-            // Gửi alert tới local log analyzer
             sh """
+            set +e
+            CRUMB=\$(curl -s -u ${JENKINS_USER}:${JENKINS_API_TOKEN} http://localhost:8080/crumbIssuer/api/json | jq -r '.crumb')
             curl -s -X POST http://localhost:8080/analyze-log \
               -H 'Content-Type: application/json' \
-              -H 'Jenkins-Crumb:${crumb}' \
+              -H 'Jenkins-Crumb:\$CRUMB' \
               -u ${JENKINS_USER}:${JENKINS_API_TOKEN} \
               -d '{"log":"BUILD_LOG_PLACEHOLDER"}' || true
             """
         }
     }
 }
+
 
