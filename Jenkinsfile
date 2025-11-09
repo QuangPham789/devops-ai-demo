@@ -167,23 +167,19 @@ pipeline {
             #!/bin/sh
             set +e
 
-            # Kiểm tra curl có sẵn
-            if ! command -v curl >/dev/null 2>&1
-            then
-                echo "curl not found, skipping log post"
-                exit 0
-            fi
+            LOG_JSON='{"log":"BUILD_LOG_PLACEHOLDER"}'
 
-            # Gửi log tới Go service
-            LOG_JSON="{\\"log\\":\\"BUILD_LOG_PLACEHOLDER\\"}"
-            curl -s -X POST http://localhost:8085/analyze-log \
-                -H "Content-Type: application/json" \
-                -d "$LOG_JSON" || true
+            # Thay localhost nếu agent là container
+            TARGET_URL="http://localhost:8085/analyze-log"
 
-            echo "Log sent to Go service on port 8085"
+            echo "Sending log to $TARGET_URL ..."
+            curl -v -X POST $TARGET_URL \
+                 -H "Content-Type: application/json" \
+                 -d "$LOG_JSON" || true
             '''
         }
     }
 }
+
 }
 
