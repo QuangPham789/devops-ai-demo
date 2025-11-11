@@ -57,7 +57,7 @@ pipeline {
         failure {
             script {
                 sh '''
-                TARGET_URL="https://tennis-scale-tyler-freeze.trycloudflare.com/analyze-log"
+                TARGET_URL="https://tobacco-marcus-even-criterion.trycloudflare.com/analyze-log"
 
                 if [ -f build.log ]; then
                     echo "Sending build.log to $TARGET_URL ..."
